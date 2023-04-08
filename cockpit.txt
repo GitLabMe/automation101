@@ -1,0 +1,41 @@
+---
+- name: install cockpit app
+  hosts: redhat
+  become: true
+  tasks:
+    - name: Install cockpit
+      package:
+           name: cockpit
+           state: present
+    - name: start cockpit
+      service:
+            name: cockpit.socket
+            state: started
+            enabled: yes
+
+    - name: add cockpit port to firewall
+      firewalld:
+            port: 9090/tcp
+            permanent: true
+            state: enabled
+
+    - name: add service to firewall
+      firewalld:
+            service: cockpit
+            permanent: true
+            state: enabled
+
+    - name: reload firewall
+      systemd:
+          name: firewalld
+          state: reloaded
+
+    - name: restart cockpit
+      service:
+          name: cockpit.socket
+          state: restarted
+          enabled: yes
+...
+
+
+
